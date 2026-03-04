@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmsController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ems-root</a> &gt; <a href="index.source.html" class="el_package">com.infinira.ems.controller</a> &gt; <span class="el_source">EmsController.java</span></div><h1>EmsController.java</h1><pre class="source lang-java linenums">package com.infinira.ems.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
+import com.infinira.ems.model.Employee;
+import com.infinira.ems.model.Department;
+import com.infinira.ems.service.EmsService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(EmsController.ROOT_PATH)
+<span class="nc" id="L16">public class EmsController {</span>
+
+    public static final String ROOT_PATH = &quot;/ems&quot;;
+
+    @Autowired
+    private EmsService emsService;
+
+    // --- Employee Endpoints ---
+
+    @PostMapping(&quot;/createEmployee&quot;)
+    public ResponseEntity&lt;Integer&gt; createEmployee(@RequestBody Employee employee) {
+<span class="nc" id="L27">        int generatedId = emsService.createEmployee(employee);</span>
+<span class="nc" id="L28">        return new ResponseEntity&lt;&gt;(generatedId, HttpStatus.CREATED);</span>
+    }
+
+    @PutMapping(&quot;/updateEmployee/{empId}&quot;)
+    public ResponseEntity&lt;Integer&gt; updateEmployee(@PathVariable int empId, @RequestBody Employee employee) {
+<span class="nc" id="L33">        int updateCount = emsService.updateEmployee(empId, employee);</span>
+<span class="nc" id="L34">        return ResponseEntity.ok(updateCount);</span>
+    }
+
+    @GetMapping(&quot;/getEmployee/{empId}&quot;)
+    public ResponseEntity&lt;Employee&gt; getEmployeeById(@PathVariable int empId) {
+<span class="nc" id="L39">        Employee employee = emsService.getEmployeeById(empId);</span>
+<span class="nc" id="L40">        return ResponseEntity.ok(employee);</span>
+    }
+
+    @GetMapping(&quot;/getEmployees&quot;)
+    public ResponseEntity&lt;List&lt;Employee&gt;&gt; getAllEmployees() {
+<span class="nc" id="L45">        List&lt;Employee&gt; employees = emsService.getAllEmployees();</span>
+<span class="nc" id="L46">        return ResponseEntity.ok(employees);</span>
+    }
+
+    @DeleteMapping(&quot;/deleteEmployee/{empId}&quot;)
+    public ResponseEntity&lt;Integer&gt; deleteEmployee(@PathVariable int empId) {
+<span class="nc" id="L51">        int delCount = emsService.deleteEmployee(empId);</span>
+<span class="nc" id="L52">        return ResponseEntity.ok(delCount);</span>
+    }
+
+    // --- Department Endpoints ---
+
+    @PostMapping(&quot;/createDepartment&quot;)
+    public ResponseEntity&lt;Integer&gt; createDepartment(@RequestBody Department department) {
+<span class="nc" id="L59">        int deptId = emsService.createDepartment(department);</span>
+<span class="nc" id="L60">        return new ResponseEntity&lt;&gt;(deptId, HttpStatus.CREATED);</span>
+    }
+
+    @PutMapping(&quot;/updateDepartment/{deptId}&quot;)
+    public ResponseEntity&lt;Integer&gt; updateDepartment(@PathVariable int deptId, @RequestBody Department department) {
+<span class="nc" id="L65">        int updateCount = emsService.updateDepartment(deptId, department);</span>
+<span class="nc" id="L66">        return ResponseEntity.ok(updateCount);</span>
+    }
+
+    @GetMapping(&quot;/getDepartment/{deptId}&quot;)
+    public ResponseEntity&lt;Department&gt; getDepartmentById(@PathVariable int deptId) {
+<span class="nc" id="L71">        Department department = emsService.getDepartmentById(deptId);</span>
+<span class="nc" id="L72">        return ResponseEntity.ok(department);</span>
+    }
+
+    @GetMapping(&quot;/getDepartments&quot;)
+    public ResponseEntity&lt;List&lt;Department&gt;&gt; getAllDepartments() {
+<span class="nc" id="L77">        List&lt;Department&gt; departments = emsService.getAllDepartments();</span>
+<span class="nc" id="L78">        return ResponseEntity.ok(departments);</span>
+    }
+
+    @DeleteMapping(&quot;/deleteDepartment/{deptId}&quot;)
+    public ResponseEntity&lt;Integer&gt; deleteDepartment(@PathVariable int deptId) {
+<span class="nc" id="L83">        int deleteCount = emsService.deleteDepartment(deptId);</span>
+<span class="nc" id="L84">        return ResponseEntity.ok(deleteCount);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

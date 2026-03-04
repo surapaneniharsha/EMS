@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DepartmentDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ems-root</a> &gt; <a href="index.source.html" class="el_package">com.infinira.ems.dao</a> &gt; <span class="el_source">DepartmentDAO.java</span></div><h1>DepartmentDAO.java</h1><pre class="source lang-java linenums">package com.infinira.ems.dao;
+
+import org.springframework.stereotype.Repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.infinira.ems.model.Department;
+import com.infinira.ems.util.DBUtil;
+import com.infinira.ems.util.Util;
+import com.infinira.ems.exception.EmsException;
+
+@Repository
+<span class="nc" id="L17">public class DepartmentDAO {</span>
+
+    public static int create(Department department) {
+<span class="nc" id="L20">        validate(department);</span>
+
+<span class="nc" id="L22">        Connection con = null;</span>
+<span class="nc" id="L23">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L24">        ResultSet rs = null;</span>
+<span class="nc" id="L25">        int deptId = 0;</span>
+
+        try {
+<span class="nc" id="L28">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L29">            pstmt = con.prepareStatement(INSERT_QUERY);</span>
+<span class="nc" id="L30">            setDeptParameters(pstmt, department);</span>
+<span class="nc" id="L31">            rs = pstmt.executeQuery();</span>
+
+<span class="nc bnc" id="L33" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L34">                deptId = rs.getInt(&quot;dept_id&quot;);</span>
+            } else {
+<span class="nc" id="L36">                throw Util.createEx(&quot;EMS_0008&quot;, null, department.getDeptName());</span>
+            }
+
+<span class="nc" id="L39">        } catch (EmsException emsEx) {</span>
+<span class="nc" id="L40">            throw emsEx;</span>
+<span class="nc" id="L41">        } catch (Throwable th) {</span>
+<span class="nc" id="L42">            throw Util.createEx(&quot;EMS_0008&quot;, th, department.getDeptName());</span>
+        } finally {
+<span class="nc" id="L44">            DBUtil.close(rs, pstmt, con);</span>
+        }
+
+<span class="nc" id="L47">        return deptId;</span>
+    }
+
+    public static int update(Department department) {
+<span class="nc" id="L51">        validate(department);</span>
+<span class="nc" id="L52">        validate(department.getDeptId());</span>
+
+<span class="nc" id="L54">        Connection con = null;</span>
+<span class="nc" id="L55">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L56">        int count = 0;</span>
+
+        try {
+<span class="nc" id="L59">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L60">            pstmt = con.prepareStatement(UPDATE_QUERY);</span>
+<span class="nc" id="L61">            int ix = setDeptParameters(pstmt, department);</span>
+<span class="nc" id="L62">            pstmt.setInt(ix, department.getDeptId());</span>
+<span class="nc" id="L63">            count = pstmt.executeUpdate();</span>
+
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (count == 0) {</span>
+<span class="nc" id="L66">                throw Util.createEx(&quot;EMS_0009&quot;, null, department.getDeptId());</span>
+            }
+
+<span class="nc" id="L69">        } catch (EmsException emsEx) {</span>
+<span class="nc" id="L70">            throw emsEx;</span>
+<span class="nc" id="L71">        } catch (Throwable th) {</span>
+<span class="nc" id="L72">            throw Util.createEx(&quot;EMS_0009&quot;, th, department.getDeptId());</span>
+        } finally {
+<span class="nc" id="L74">            DBUtil.close(null, pstmt, con);</span>
+        }
+
+<span class="nc" id="L77">        return count;</span>
+    }
+
+    public static Department getById(int deptId) {
+<span class="nc" id="L81">        validate(deptId);</span>
+
+<span class="nc" id="L83">        Connection con = null;</span>
+<span class="nc" id="L84">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L85">        ResultSet rs = null;</span>
+
+        try {
+<span class="nc" id="L88">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L89">            pstmt = con.prepareStatement(GETID_QUERY);</span>
+<span class="nc" id="L90">            pstmt.setInt(1, deptId);</span>
+<span class="nc" id="L91">            rs = pstmt.executeQuery();</span>
+
+<span class="nc bnc" id="L93" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L94">                return getDeptParameters(rs);</span>
+            } else {
+<span class="nc" id="L96">                throw Util.createEx(&quot;EMS_0010&quot;, null, deptId);</span>
+            }
+
+<span class="nc" id="L99">        } catch (EmsException emsEx) {</span>
+<span class="nc" id="L100">            throw emsEx;</span>
+<span class="nc" id="L101">        } catch (Throwable th) {</span>
+<span class="nc" id="L102">            throw Util.createEx(&quot;EMS_0010&quot;, th, deptId);</span>
+        } finally {
+<span class="nc" id="L104">            DBUtil.close(rs, pstmt, con);</span>
+        }
+    }
+
+    public static List&lt;Department&gt; getAll() {
+<span class="nc" id="L109">        List&lt;Department&gt; departments = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L110">        Connection con = null;</span>
+<span class="nc" id="L111">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L112">        ResultSet rs = null;</span>
+
+        try {
+<span class="nc" id="L115">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L116">            pstmt = con.prepareStatement(GETALL_QUERY);</span>
+<span class="nc" id="L117">            rs = pstmt.executeQuery();</span>
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L120">                departments.add(getDeptParameters(rs));</span>
+            }
+
+<span class="nc bnc" id="L123" title="All 2 branches missed.">            if(departments.isEmpty()) {</span>
+<span class="nc" id="L124">                throw Util.createEx(&quot;EMS_0011&quot;, null);</span>
+            }
+
+<span class="nc" id="L127">        } catch(EmsException emsEx) {</span>
+<span class="nc" id="L128">            throw emsEx;</span>
+<span class="nc" id="L129">        } catch (Throwable th) {</span>
+<span class="nc" id="L130">            throw Util.createEx(&quot;EMS_0011&quot;, th);</span>
+        } finally {
+<span class="nc" id="L132">            DBUtil.close(rs, pstmt, con);</span>
+        }
+
+<span class="nc" id="L135">        return departments;</span>
+    }
+
+    public static int delete(int deptId) {
+<span class="nc" id="L139">        validate(deptId);</span>
+
+<span class="nc" id="L141">        Connection con = null;</span>
+<span class="nc" id="L142">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L143">        int count = 0;</span>
+
+        try {
+<span class="nc" id="L146">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L147">            pstmt = con.prepareStatement(DELETE_QUERY);</span>
+<span class="nc" id="L148">            pstmt.setInt(1, deptId);</span>
+<span class="nc" id="L149">            count = pstmt.executeUpdate();</span>
+
+<span class="nc bnc" id="L151" title="All 2 branches missed.">            if (count == 0) {</span>
+<span class="nc" id="L152">                throw Util.createEx(&quot;EMS_0010&quot;, null, deptId);</span>
+            }
+
+<span class="nc" id="L155">        } catch (EmsException emsEx) {</span>
+<span class="nc" id="L156">            throw emsEx;</span>
+<span class="nc" id="L157">        } catch (Throwable th) {</span>
+<span class="nc" id="L158">            throw Util.createEx(&quot;EMS_0012&quot;, th, deptId);</span>
+        } finally {
+<span class="nc" id="L160">            DBUtil.close(null, pstmt, con);</span>
+        }
+
+<span class="nc" id="L163">        return count;</span>
+    }
+
+    private static int setDeptParameters(PreparedStatement pstmt, Department department) throws Throwable {
+<span class="nc" id="L167">        int ix = 1;</span>
+<span class="nc" id="L168">        pstmt.setString(ix++, department.getDeptName());</span>
+<span class="nc" id="L169">        pstmt.setString(ix++, department.getLocation());</span>
+<span class="nc" id="L170">        return ix;</span>
+    }
+
+    private static Department getDeptParameters(ResultSet rs) throws Throwable {
+        // Using default constructor to avoid validation logic during DB mapping
+<span class="nc" id="L175">        Department department = new Department();</span>
+<span class="nc" id="L176">        department.setDeptId(rs.getInt(&quot;dept_id&quot;));</span>
+<span class="nc" id="L177">        department.setDeptName(rs.getString(&quot;dept_name&quot;));</span>
+<span class="nc" id="L178">        department.setLocation(rs.getString(&quot;location&quot;));</span>
+<span class="nc" id="L179">        return department;</span>
+    }
+
+    private static void validate(Object obj) {
+<span class="nc bnc" id="L183" title="All 2 branches missed.">        if (obj instanceof Department) {</span>
+<span class="nc" id="L184">            return;</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        } else if (obj instanceof Integer id) {</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">            if (id &lt;= 0) {</span>
+<span class="nc" id="L187">                throw Util.createEx(&quot;EMS_0010&quot;, null, id);</span>
+            }
+        } else {
+<span class="nc" id="L190">            throw Util.createEx(&quot;EMS_0007&quot;, null);</span>
+        }
+<span class="nc" id="L192">    }</span>
+
+    // --- UPDATED QUERIES ---
+    private static final String INSERT_QUERY = &quot;&quot;&quot;
+        INSERT INTO department (dept_name, location) VALUES (?, ?)
+        RETURNING dept_id;
+    &quot;&quot;&quot;;
+
+    private static final String UPDATE_QUERY = &quot;&quot;&quot;
+        UPDATE department SET dept_name = ?, location = ?
+        WHERE dept_id = ?;
+    &quot;&quot;&quot;;
+
+    private static final String GETID_QUERY = &quot;&quot;&quot;
+        SELECT dept_id, dept_name, location
+        FROM department
+        WHERE dept_id = ?;
+    &quot;&quot;&quot;;
+
+    private static final String GETALL_QUERY = &quot;&quot;&quot;
+        SELECT dept_id, dept_name, location
+        FROM department;
+    &quot;&quot;&quot;;
+
+    private static final String DELETE_QUERY = &quot;DELETE FROM department WHERE dept_id = ?;&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

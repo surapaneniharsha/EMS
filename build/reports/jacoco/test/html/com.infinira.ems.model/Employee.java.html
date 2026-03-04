@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Employee.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ems-root</a> &gt; <a href="index.source.html" class="el_package">com.infinira.ems.model</a> &gt; <span class="el_source">Employee.java</span></div><h1>Employee.java</h1><pre class="source lang-java linenums">package com.infinira.ems.model;
+
+import com.infinira.ems.enums.Gender;
+import com.infinira.ems.enums.MaritalStatus;
+import java.text.MessageFormat;
+
+public class Employee {
+    private int empId;
+    private String firstName;
+    private String lastName;
+    private String phone;
+    private String email;
+    private String gender;
+    private String nationalId;
+    private String passportId;
+    private String citizenship;
+    private String maritalStatus;
+    private String bloodGroup;
+    private String identityMarks;
+    private int salary;
+    private String jobTitle;
+    private boolean disability;
+    private String bankName;
+    private String accNo;
+    private int deptId;
+
+<span class="nc" id="L27">    public Employee() { }</span>
+
+<span class="nc" id="L29">    public Employee(String firstName, String lastName, String phone, String email) {</span>
+<span class="nc" id="L30">        this.firstName = firstName;</span>
+<span class="nc" id="L31">        this.lastName = lastName;</span>
+<span class="nc" id="L32">        this.phone = phone;</span>
+<span class="nc" id="L33">        this.email = email;</span>
+
+<span class="nc" id="L35">        validate();</span>
+<span class="nc" id="L36">    }</span>
+
+    //  Setters
+    public void setEmpId(int empId) {
+<span class="nc" id="L40">        this.empId = empId;</span>
+<span class="nc" id="L41">    }</span>
+
+    public void setFirstName(String firstName) {
+<span class="nc" id="L44">        validate(&quot;firstName&quot;, firstName);</span>
+<span class="nc" id="L45">        this.firstName = firstName;</span>
+<span class="nc" id="L46">    }</span>
+
+    public void setLastName(String lastName) {
+<span class="nc" id="L49">        validate(&quot;lastName&quot;, lastName);</span>
+<span class="nc" id="L50">        this.lastName = lastName;</span>
+<span class="nc" id="L51">    }</span>
+
+    public void setPhone(String phone) {
+<span class="nc" id="L54">        validate(&quot;phone&quot;, phone);</span>
+<span class="nc" id="L55">        this.phone = phone;</span>
+<span class="nc" id="L56">    }</span>
+
+    public void setEmail(String email) {
+<span class="nc" id="L59">        validate(&quot;email&quot;, email);</span>
+<span class="nc" id="L60">        this.email = email;</span>
+<span class="nc" id="L61">    }</span>
+
+    public void setGender(String gender) {
+<span class="nc" id="L64">        validate(&quot;gender&quot;, gender);</span>
+<span class="nc" id="L65">        this.gender = Gender.getValue(gender);</span>
+<span class="nc" id="L66">    }</span>
+
+    public void setNationalId(String nationalId) {
+<span class="nc" id="L69">        validate(&quot;nationalId&quot;, nationalId);</span>
+<span class="nc" id="L70">        this.nationalId = nationalId;</span>
+<span class="nc" id="L71">    }</span>
+
+    public void setPassportId(String passportId) {
+<span class="nc" id="L74">        this.passportId = passportId;</span>
+
+<span class="nc" id="L76">    }</span>
+
+    public void setCitizenship(String citizenship) {
+<span class="nc" id="L79">        this.citizenship = citizenship;</span>
+<span class="nc" id="L80">    }</span>
+
+    public void setMaritalStatus(String maritalStatus) {
+<span class="nc" id="L83">        validate(&quot;marital_status&quot;, maritalStatus);</span>
+<span class="nc" id="L84">        this.maritalStatus = MaritalStatus.getValue(maritalStatus);</span>
+<span class="nc" id="L85">    }</span>
+
+    public void setBloodGroup(String bloodGroup) {
+<span class="nc" id="L88">        this.bloodGroup = bloodGroup;</span>
+<span class="nc" id="L89">    }</span>
+
+    public void setIdentityMarks(String identityMarks) {
+<span class="nc" id="L92">        validate(&quot;identityMarks&quot;, identityMarks);</span>
+<span class="nc" id="L93">        this.identityMarks = identityMarks;</span>
+<span class="nc" id="L94">    }</span>
+
+    public void setSalary(int salary) {
+<span class="nc" id="L97">        validate(&quot;salary&quot;, salary);</span>
+<span class="nc" id="L98">        this.salary = salary;</span>
+<span class="nc" id="L99">    }</span>
+
+    public void setJobTitle(String jobTitle) {
+<span class="nc" id="L102">        validate(&quot;jobTitle&quot;, jobTitle);</span>
+<span class="nc" id="L103">        this.jobTitle = jobTitle;</span>
+<span class="nc" id="L104">    }</span>
+
+    public void setDisability(boolean disability) {
+<span class="nc" id="L107">        this.disability = disability;</span>
+<span class="nc" id="L108">    }</span>
+
+    public void setBankName(String bankName) {
+<span class="nc" id="L111">        this.bankName = bankName;</span>
+<span class="nc" id="L112">    }</span>
+
+    public void setAccNo(String accNo) {
+<span class="nc" id="L115">        this.accNo = accNo;</span>
+<span class="nc" id="L116">    }</span>
+
+    public void setDeptId(int deptId) {
+<span class="nc" id="L119">        this.deptId = deptId;</span>
+<span class="nc" id="L120">    }</span>
+
+
+    // Getters
+    public int getEmpId() {
+<span class="nc" id="L125">        return empId;</span>
+    }
+
+    public String getFirstName() {
+<span class="nc" id="L129">        return firstName;</span>
+    }
+
+    public String getLastName() {
+<span class="nc" id="L133">        return lastName;</span>
+    }
+
+    public String getPhone() {
+<span class="nc" id="L137">        return phone;</span>
+    }
+
+    public String getEmail() {
+<span class="nc" id="L141">        return email;</span>
+    }
+
+    public String getGender() {
+<span class="nc" id="L145">        return gender;</span>
+    }
+
+    public String getNationalId() {
+<span class="nc" id="L149">        return nationalId;</span>
+    }
+
+    public String getPassportId() {
+<span class="nc" id="L153">        return passportId;</span>
+    }
+
+    public String getCitizenship() {
+<span class="nc" id="L157">        return citizenship;</span>
+    }
+
+    public String getMaritalStatus() {
+<span class="nc" id="L161">        return maritalStatus;</span>
+    }
+
+    public String getBloodGroup() {
+<span class="nc" id="L165">        return bloodGroup;</span>
+    }
+
+    public String getIdentityMarks() {
+<span class="nc" id="L169">        return identityMarks;</span>
+    }
+
+    public int getSalary() {
+<span class="nc" id="L173">        return salary;</span>
+    }
+
+    public String getJobTitle() {
+<span class="nc" id="L177">        return jobTitle;</span>
+    }
+
+    public boolean isDisability() {
+<span class="nc" id="L181">        return disability;</span>
+    }
+
+    public String getBankName() {
+<span class="nc" id="L185">        return bankName;</span>
+    }
+
+    public String getAccNo() {
+<span class="nc" id="L189">        return accNo;</span>
+    }
+
+    public int getDeptId() {
+<span class="nc" id="L193">        return deptId;</span>
+    }
+
+    public void validate() {
+<span class="nc" id="L197">        validate(&quot;firstName&quot;, firstName);</span>
+<span class="nc" id="L198">        validate(&quot;lastName&quot;, lastName);</span>
+<span class="nc" id="L199">        validate(&quot;phone&quot;, phone);</span>
+<span class="nc" id="L200">        validate(&quot;email&quot;, email);</span>
+<span class="nc" id="L201">    }</span>
+
+    private static void validate(String paramName, Object paramValue) {
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        if(paramValue == null) {</span>
+<span class="nc" id="L205">            throw new RuntimeException(MessageFormat.format(EMS_XXX, paramName));</span>
+        }
+<span class="nc bnc" id="L207" title="All 2 branches missed.">        if(paramValue instanceof String str) {</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">            if(str.isBlank()) {</span>
+<span class="nc" id="L209">                throw new RuntimeException(MessageFormat.format(EMS_XXX, paramName));</span>
+            }
+<span class="nc bnc" id="L211" title="All 2 branches missed.">        } else if (paramValue instanceof Integer intValue) {</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">            if (intValue &lt;= 0) {</span>
+<span class="nc" id="L213">                throw new RuntimeException(MessageFormat.format(EMS_XXX, paramName));</span>
+            }
+        
+        }
+<span class="nc" id="L217">    }</span>
+
+    private static final String EMS_XXX = &quot;Invalid value for {0}&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

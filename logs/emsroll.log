@@ -1,0 +1,15 @@
+2026-02-23 08:42:35.950 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.5 with PID 33508 (H:\projects\ems-root\ems\build\classes\java\main started by haris in H:\projects\ems-root\ems)
+2026-02-23 08:42:35.953 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-23 08:42:37.417 [main] INFO  logStarted org.springframework.boot.StartupInfoLogger - Started EmsApplication in 1.835 seconds (process running for 2.672)
+2026-02-24 11:15:37.490 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.5 with PID 13284 (H:\projects\ems-root\ems\build\classes\java\main started by haris in H:\projects\ems-root\ems)
+2026-02-24 11:15:37.499 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-24 11:15:39.618 [main] INFO  logStarted org.springframework.boot.StartupInfoLogger - Started EmsApplication in 2.568 seconds (process running for 3.663)
+2026-02-24 14:29:59.695 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.5 with PID 32652 (H:\projects\ems-root\ems\build\classes\java\main started by haris in H:\projects\ems-root\ems)
+2026-02-24 14:29:59.705 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-24 14:30:00.730 [main] INFO  logStarted org.springframework.boot.StartupInfoLogger - Started EmsApplication in 1.264 seconds (process running for 1.836)
+2026-02-25 11:08:08.271 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.5 with PID 9320 (H:\projects\ems-root\ems\build\classes\java\main started by haris in H:\projects\ems-root\ems)
+2026-02-25 11:08:08.278 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-25 11:08:12.219 [main] INFO  logStarted org.springframework.boot.StartupInfoLogger - Started EmsApplication in 4.427 seconds (process running for 5.573)
+2026-02-25 11:49:14.959 [http-nio-8080-exec-6] ERROR createEx com.infinira.ems.util.Util - No department found with the Id 59.
+2026-02-25 11:50:27.370 [http-nio-8080-exec-1] ERROR createEx com.infinira.ems.util.Util - No employee found with the Id 67.
+2026-02-25 14:35:49.458 [http-nio-8080-exec-6] ERROR createEx com.infinira.ems.util.Util - No department found with the Id 65.

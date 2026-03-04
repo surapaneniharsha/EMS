@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ResourceUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ems-root</a> &gt; <a href="index.source.html" class="el_package">com.infinira.ems.util</a> &gt; <span class="el_source">ResourceUtil.java</span></div><h1>ResourceUtil.java</h1><pre class="source lang-java linenums">package com.infinira.ems.util;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.text.MessageFormat;
+
+public class ResourceUtil {
+
+    private static volatile ResourceUtil instance;
+    private  ResourceBundle resourceBundle;
+
+    private static final String MESSAGES_BASE_NAME = &quot;ems_messages&quot;;
+
+<span class="nc" id="L14">    private ResourceUtil() {</span>
+        try {
+<span class="nc" id="L16">            resourceBundle = ResourceBundle.getBundle(MESSAGES_BASE_NAME, Locale.getDefault());</span>
+<span class="nc" id="L17">        } catch (Exception ex) { </span>
+<span class="nc" id="L18">            throw new RuntimeException(MessageFormat.format(EMS_001, MESSAGES_BASE_NAME), ex);</span>
+<span class="nc" id="L19">        }</span>
+<span class="nc" id="L20">    }</span>
+
+    public static ResourceUtil getInstance() {
+<span class="nc bnc" id="L23" title="All 2 branches missed.">        if (instance == null) {</span>
+<span class="nc" id="L24">            synchronized (ResourceUtil.class) {</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">                if (instance == null) {</span>
+<span class="nc" id="L26">                    instance = new ResourceUtil();</span>
+                }
+<span class="nc" id="L28">            }</span>
+        }
+<span class="nc" id="L30">        return instance;</span>
+    }
+        
+    public String getMessages(String key, Object... params) {
+        
+<span class="nc bnc" id="L35" title="All 4 branches missed.">        if (key == null || key.isEmpty()) {</span>
+<span class="nc" id="L36">            return EMS_002;</span>
+        }
+
+        String message;
+        try {
+<span class="nc" id="L41">            message = resourceBundle.getString(key);</span>
+<span class="nc bnc" id="L42" title="All 4 branches missed.">            if (message == null || message.isEmpty()) {</span>
+<span class="nc" id="L43">                return MessageFormat.format(EMS_003, key);</span>
+            }
+<span class="nc" id="L45">        } catch (Exception ex) {</span>
+<span class="nc" id="L46">               return MessageFormat.format(EMS_004, key, MESSAGES_BASE_NAME);</span>
+<span class="nc" id="L47">        }</span>
+
+        try {
+<span class="nc" id="L50">            return MessageFormat.format(message, params);</span>
+<span class="nc" id="L51">        } catch (Exception ex) {</span>
+<span class="nc" id="L52">            return MessageFormat.format(EMS_005, key, params);</span>
+        }
+    }
+
+    private static final String EMS_001 = &quot;Failed to load resource bundle properties : ''{0}'' . Please check.&quot;;
+    private static final String EMS_002 = &quot;keys cannot be null or empty in Message property file . Please check.&quot;;
+    private static final String EMS_003 = &quot;Message for key ''{0}''  cannot be null or empty.&quot;;
+    private static final String EMS_004 = &quot;Failed to find message key ''{0}'' in ''{1}''&quot;;
+    private static final String EMS_005 = &quot;Message formating issue for key ''{0}'' with parameters ''{1}''&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

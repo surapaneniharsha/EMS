@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmployeeDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ems-root</a> &gt; <a href="index.source.html" class="el_package">com.infinira.ems.dao</a> &gt; <span class="el_source">EmployeeDAO.java</span></div><h1>EmployeeDAO.java</h1><pre class="source lang-java linenums">package com.infinira.ems.dao;
+
+import org.springframework.stereotype.Repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.ArrayList;
+import com.infinira.ems.util.DBUtil;
+import com.infinira.ems.util.Util;
+import com.infinira.ems.util.ResourceUtil;
+import com.infinira.ems.model.Employee;
+import com.infinira.ems.exception.EmsException;
+
+import static java.sql.Types.INTEGER;
+
+@Repository
+<span class="nc" id="L19">public class EmployeeDAO {</span>
+
+    public  int create(Employee employee) {
+<span class="nc" id="L22">        validate(employee);</span>
+
+<span class="nc" id="L24">        Connection con = null;</span>
+<span class="nc" id="L25">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L26">        ResultSet rs = null;</span>
+<span class="nc" id="L27">        int empId = 0;</span>
+
+        try {
+<span class="nc" id="L30">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L31">            pstmt = con.prepareStatement(INSERT_QUERY);</span>
+<span class="nc" id="L32">            setEmpParameters(pstmt, employee);</span>
+<span class="nc" id="L33">            rs = pstmt.executeQuery();</span>
+
+<span class="nc bnc" id="L35" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L36">                empId = rs.getInt(&quot;emp_id&quot;);</span>
+            } else {
+<span class="nc" id="L38">                throw Util.createEx(&quot;EMS_0002&quot;, null, employee.getFirstName(), employee.getLastName(), employee.getPhone());</span>
+            }
+
+<span class="nc" id="L41">        } catch (EmsException emsEx) {</span>
+<span class="nc" id="L42">            throw emsEx;</span>
+<span class="nc" id="L43">        } catch (Throwable th) {</span>
+<span class="nc" id="L44">            throw Util.createEx(&quot;EMS_0002&quot;, th, employee.getFirstName(), employee.getLastName(), employee.getPhone());</span>
+        } finally {
+<span class="nc" id="L46">            DBUtil.close(rs, pstmt, con);</span>
+        }
+
+<span class="nc" id="L49">        return empId;</span>
+    }
+
+    public  int update(Employee employee) {
+<span class="nc" id="L53">        validate(employee);</span>
+<span class="nc" id="L54">        validate(employee.getEmpId());</span>
+
+<span class="nc" id="L56">        Connection con = null;</span>
+<span class="nc" id="L57">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L58">        int count = 0;</span>
+
+        try {
+<span class="nc" id="L61">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L62">            pstmt = con.prepareStatement(UPDATE_QUERY);</span>
+<span class="nc" id="L63">            int ix = setEmpParameters(pstmt, employee);</span>
+<span class="nc" id="L64">            pstmt.setInt(ix, employee.getEmpId());</span>
+<span class="nc" id="L65">            count = pstmt.executeUpdate();</span>
+
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            if (count == 0) {</span>
+<span class="nc" id="L68">                throw Util.createEx(&quot;EMS_0004&quot;, null, employee.getEmpId());</span>
+            }
+
+<span class="nc" id="L71">        } catch (EmsException emsEx) {</span>
+<span class="nc" id="L72">            throw emsEx;</span>
+<span class="nc" id="L73">        } catch (Throwable th) {</span>
+<span class="nc" id="L74">            throw Util.createEx(&quot;EMS_0003&quot;, th, employee.getEmpId(), employee.getFirstName());</span>
+        } finally {
+<span class="nc" id="L76">            DBUtil.close(null, pstmt, con);</span>
+        }
+
+<span class="nc" id="L79">        return count;</span>
+    }
+
+    public  Employee getById(int empId) {
+<span class="nc" id="L83">        validate(empId);</span>
+
+<span class="nc" id="L85">        Connection con = null;</span>
+<span class="nc" id="L86">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L87">        ResultSet rs = null;</span>
+
+        try {
+<span class="nc" id="L90">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L91">            pstmt = con.prepareStatement(GETID_QUERY);</span>
+<span class="nc" id="L92">            pstmt.setInt(1, empId);</span>
+<span class="nc" id="L93">            rs = pstmt.executeQuery();</span>
+
+<span class="nc bnc" id="L95" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L96">                return getEmpParameters(rs);</span>
+            } else {
+<span class="nc" id="L98">                throw Util.createEx(&quot;EMS_0004&quot;, null, empId);</span>
+            }
+
+<span class="nc" id="L101">        } catch (EmsException emsEx) {</span>
+<span class="nc" id="L102">            throw emsEx;</span>
+<span class="nc" id="L103">        } catch (Throwable th) {</span>
+<span class="nc" id="L104">            throw Util.createEx(&quot;EMS_0004&quot;, th, empId);</span>
+        } finally {
+<span class="nc" id="L106">            DBUtil.close(rs, pstmt, con);</span>
+        }
+    }
+
+    public  List&lt;Employee&gt; getAll() {
+<span class="nc" id="L111">        List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L112">        Connection con = null;</span>
+<span class="nc" id="L113">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L114">        ResultSet rs = null;</span>
+
+        try {
+<span class="nc" id="L117">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L118">            pstmt = con.prepareStatement(GETALL_QUERY);</span>
+<span class="nc" id="L119">            rs = pstmt.executeQuery();</span>
+
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L122">                employees.add(getEmpParameters(rs));</span>
+            }
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">            if(employees.isEmpty()) {</span>
+<span class="nc" id="L126">                throw Util.createEx(&quot;EMS_0005&quot;, null);</span>
+            }
+
+<span class="nc" id="L129">        } catch(EmsException emsEx) {</span>
+<span class="nc" id="L130">            throw emsEx;</span>
+<span class="nc" id="L131">        }catch (Throwable th) {</span>
+<span class="nc" id="L132">            throw Util.createEx(&quot;EMS_0005&quot;, th);</span>
+        } finally {
+<span class="nc" id="L134">            DBUtil.close(rs, pstmt, con);</span>
+        }
+
+<span class="nc" id="L137">        return employees;</span>
+    }
+
+    public  int delete(int empId) {
+<span class="nc" id="L141">        validate(empId);</span>
+
+<span class="nc" id="L143">        Connection con = null;</span>
+<span class="nc" id="L144">        PreparedStatement pstmt = null;</span>
+<span class="nc" id="L145">        int count = 0;</span>
+
+        try {
+<span class="nc" id="L148">            con = DBUtil.getInstance().getConnection();</span>
+<span class="nc" id="L149">            pstmt = con.prepareStatement(DELETE_QUERY);</span>
+<span class="nc" id="L150">            pstmt.setInt(1, empId);</span>
+<span class="nc" id="L151">            count = pstmt.executeUpdate();</span>
+
+<span class="nc bnc" id="L153" title="All 2 branches missed.">            if (count == 0) {</span>
+<span class="nc" id="L154">                throw Util.createEx(&quot;EMS_0004&quot;, null, empId);</span>
+            }
+
+<span class="nc" id="L157">        } catch (EmsException emsEx) {</span>
+<span class="nc" id="L158">            throw emsEx;</span>
+<span class="nc" id="L159">        } catch (Throwable th) {</span>
+<span class="nc" id="L160">            throw Util.createEx(&quot;EMS_0006&quot;, th, empId);</span>
+        } finally {
+<span class="nc" id="L162">            DBUtil.close(null, pstmt, con);</span>
+        }
+
+<span class="nc" id="L165">        return count;</span>
+    }
+
+    private  int setEmpParameters(PreparedStatement pstmt, Employee employee) throws Throwable {
+<span class="nc" id="L169">        int ix = 1;</span>
+<span class="nc" id="L170">        pstmt.setString(ix++, employee.getFirstName());</span>
+<span class="nc" id="L171">        pstmt.setString(ix++, employee.getLastName());</span>
+<span class="nc" id="L172">        pstmt.setString(ix++, employee.getPhone());</span>
+<span class="nc" id="L173">        pstmt.setString(ix++, employee.getEmail());</span>
+<span class="nc" id="L174">        pstmt.setString(ix++, employee.getGender());</span>
+<span class="nc" id="L175">        pstmt.setString(ix++, employee.getNationalId());</span>
+<span class="nc" id="L176">        pstmt.setString(ix++, employee.getPassportId());</span>
+<span class="nc" id="L177">        pstmt.setString(ix++, employee.getCitizenship());</span>
+<span class="nc" id="L178">        pstmt.setString(ix++, employee.getMaritalStatus());</span>
+<span class="nc" id="L179">        pstmt.setString(ix++, employee.getBloodGroup());</span>
+<span class="nc" id="L180">        pstmt.setString(ix++, employee.getIdentityMarks());</span>
+<span class="nc" id="L181">        pstmt.setInt(ix++, employee.getSalary());</span>
+<span class="nc" id="L182">        pstmt.setString(ix++, employee.getJobTitle());</span>
+<span class="nc" id="L183">        pstmt.setBoolean(ix++, employee.isDisability());</span>
+<span class="nc" id="L184">        pstmt.setString(ix++, employee.getBankName());</span>
+<span class="nc" id="L185">        pstmt.setString(ix++, employee.getAccNo());</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">        if (employee.getDeptId() &lt;= 0 ) {</span>
+<span class="nc" id="L187">            throw Util.createEx(&quot;EMS_0001&quot;, null, &quot;Department ID&quot;);</span>
+        } else {
+<span class="nc" id="L189">            pstmt.setInt(ix++, employee.getDeptId());</span>
+        }
+<span class="nc" id="L191">        return ix;</span>
+    }
+
+    private  Employee getEmpParameters(ResultSet rs) throws Throwable {
+<span class="nc" id="L195">        Employee employee = new Employee(</span>
+<span class="nc" id="L196">            rs.getString(&quot;first_name&quot;),</span>
+<span class="nc" id="L197">            rs.getString(&quot;last_name&quot;),</span>
+<span class="nc" id="L198">            rs.getString(&quot;phone&quot;),</span>
+<span class="nc" id="L199">            rs.getString(&quot;email&quot;)</span>
+        );
+<span class="nc" id="L201">        employee.setEmpId(rs.getInt(&quot;emp_id&quot;));</span>
+<span class="nc" id="L202">        employee.setGender(rs.getString(&quot;gender&quot;));</span>
+<span class="nc" id="L203">        employee.setNationalId(rs.getString(&quot;national_id&quot;));</span>
+<span class="nc" id="L204">        employee.setPassportId(rs.getString(&quot;passport_id&quot;));</span>
+<span class="nc" id="L205">        employee.setCitizenship(rs.getString(&quot;citizenship&quot;));</span>
+<span class="nc" id="L206">        employee.setMaritalStatus(rs.getString(&quot;marital_status&quot;));</span>
+<span class="nc" id="L207">        employee.setBloodGroup(rs.getString(&quot;blood_group&quot;));</span>
+<span class="nc" id="L208">        employee.setIdentityMarks(rs.getString(&quot;identity_marks&quot;));</span>
+<span class="nc" id="L209">        employee.setSalary(rs.getInt(&quot;salary&quot;));</span>
+<span class="nc" id="L210">        employee.setJobTitle(rs.getString(&quot;job_title&quot;));</span>
+<span class="nc" id="L211">        employee.setDisability(rs.getBoolean(&quot;disability&quot;));</span>
+<span class="nc" id="L212">        employee.setBankName(rs.getString(&quot;bank_name&quot;));</span>
+<span class="nc" id="L213">        employee.setAccNo(rs.getString(&quot;acc_no&quot;));</span>
+<span class="nc" id="L214">        employee.setDeptId(rs.getInt(&quot;dept_id&quot;));</span>
+<span class="nc" id="L215">        return employee;</span>
+    }
+
+    private static void validate(Object obj) {
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        if (obj instanceof Employee) {</span>
+<span class="nc" id="L220">            return;</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        } else if (obj instanceof Integer empId) {</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">            if (empId &lt;= 0) {</span>
+<span class="nc" id="L223">                throw Util.createEx(&quot;EMS_0004&quot;, null, empId);</span>
+            }
+        } else {
+<span class="nc" id="L226">            throw Util.createEx(&quot;EMS_0001&quot;, null);</span>
+        }
+<span class="nc" id="L228">    }</span>
+
+    private static final String INSERT_QUERY = &quot;&quot;&quot; 
+    INSERT INTO employee (first_name, last_name, phone, email, gender, national_id, passport_id, citizenship, marital_status, blood_group,
+                          identity_marks, salary, job_title, disability, bank_name, acc_no, dept_id) 
+    VALUES (?, ?, ?, ?, ?::gender_enum, ?, ?, ?, ?::marital_enum, ?, ?, ?, ?, ?, ?, ?, ?) 
+    RETURNING emp_id;
+    &quot;&quot;&quot;;
+
+    private static final String UPDATE_QUERY = &quot;&quot;&quot;
+    UPDATE employee SET
+        first_name = ?, last_name = ?, phone = ?, email = ?, gender = ?::gender_enum,
+        national_id = ?, passport_id = ?, citizenship = ?, marital_status = ?::marital_enum, blood_group = ?,
+        identity_marks = ?, salary = ?, job_title = ?, disability = ?, bank_name = ?, acc_no = ?, dept_id = ?
+    WHERE emp_id = ?;
+    &quot;&quot;&quot;;
+
+    private static final String GETID_QUERY = &quot;&quot;&quot;
+    SELECT emp_id, first_name, last_name, phone, email, gender, national_id, passport_id, citizenship, marital_status, blood_group,
+           identity_marks, salary, job_title, disability, bank_name, acc_no, dept_id 
+    FROM employee 
+    WHERE emp_id = ?;
+    &quot;&quot;&quot;;
+
+    private static final String GETALL_QUERY = &quot;&quot;&quot;
+    SELECT emp_id, first_name, last_name, phone, email, gender, national_id, passport_id, citizenship, marital_status, blood_group,
+           identity_marks, salary, job_title, disability, bank_name, acc_no, dept_id 
+    FROM employee;
+    &quot;&quot;&quot;;
+
+    private static final String DELETE_QUERY = &quot;DELETE FROM employee WHERE emp_id = ?;&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
