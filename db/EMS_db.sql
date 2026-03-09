@@ -1,4 +1,7 @@
-\c ems
+DROP DATABASE IF EXISTS ems_db;
+
+CREATE DATABASE ems_db;
+\c ems_db
 -- 1. Drop Child Table first (due to Foreign Key)
 DROP TABLE IF EXISTS employee;
 

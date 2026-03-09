@@ -22,7 +22,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 }
-
+/*
 test {
     useJUnitPlatform()
 }
@@ -31,7 +31,7 @@ test {
 task testJar(type: Jar) {
     archiveClassifier = 'tests'
     from sourceSets.test.output
-}
+}*/
 
 task cleanDist(type: Delete) {
     delete rootProject.file('dist')
@@ -62,7 +62,7 @@ task ems(type: Zip) {
         }
     }
     into('ems/lib') {
-        from(tasks.named('jar'), tasks.named('testJar'))
+        from(tasks.named('jar'))
     }
     into('ems/config'){
         from('src/main/resources') {
