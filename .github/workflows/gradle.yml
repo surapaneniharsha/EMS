@@ -37,5 +37,5 @@ jobs:
     - name: Build Project (Skip Tests)
       run: ./gradlew clean build -x test
 
-    - name: Run Application
-      run: ./gradlew bootRun
+#    - name: Run Application
+#      run: ./gradlew bootRun
