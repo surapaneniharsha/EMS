@@ -59,8 +59,11 @@ public class DBUtil {
 
     public Connection getConnection() {
         try {
+			 System.setProperty("user.timezone", "Asia/Kolkata");
+			Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(url, user, password);
         } catch (Throwable th) {
+			th.printStackTrace();
             throw new RuntimeException(MessageFormat.format(EMS_004, url, user));
         }
     }

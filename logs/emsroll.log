@@ -13,3 +13,32 @@
 2026-02-25 11:49:14.959 [http-nio-8080-exec-6] ERROR createEx com.infinira.ems.util.Util - No department found with the Id 59.
 2026-02-25 11:50:27.370 [http-nio-8080-exec-1] ERROR createEx com.infinira.ems.util.Util - No employee found with the Id 67.
 2026-02-25 14:35:49.458 [http-nio-8080-exec-6] ERROR createEx com.infinira.ems.util.Util - No department found with the Id 65.
+2026-03-09 12:30:11.467 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 38516 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 12:30:11.480 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 13:40:53.252 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 17400 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 13:40:53.265 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 13:41:35.543 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 40076 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 13:41:35.555 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 13:43:47.711 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 37968 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 13:43:47.723 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 13:47:48.713 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 18856 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 13:47:48.727 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 13:48:41.333 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 4048 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 13:48:41.347 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 13:49:54.730 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 32368 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 13:49:54.742 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 22:15:21.827 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 41236 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 22:15:21.839 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 22:16:36.119 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 42248 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 22:16:36.131 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-09 22:18:54.281 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 28808 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-09 22:18:54.296 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-10 11:35:48.728 [Test worker] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting TestDepartment using Java 21.0.4 with PID 38388 (started by surap in C:\work\AI\E2E\ems)
+2026-03-10 11:35:48.735 [Test worker] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-10 11:35:51.112 [Test worker] INFO  logStarted org.springframework.boot.StartupInfoLogger - Started TestDepartment in 2.817 seconds (process running for 5.47)
+2026-03-10 11:38:16.751 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 40932 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-10 11:38:16.761 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-10 11:39:51.288 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 3112 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-10 11:39:51.299 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-10 11:40:06.934 [main] INFO  logStarting org.springframework.boot.StartupInfoLogger - Starting EmsApplication using Java 21.0.4 with PID 40012 (C:\work\AI\E2E\ems\build\classes\java\main started by surap in C:\work\AI\E2E\ems)
+2026-03-10 11:40:06.946 [main] INFO  logStartupProfileInfo org.springframework.boot.SpringApplication - No active profile set, falling back to 1 default profile: "default"
