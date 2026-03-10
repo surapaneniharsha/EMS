@@ -36,26 +36,32 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: admin
-          POSTGRES_DB: ems_db
-        ports:
-          - 5432:5432
-        volumes:
-          - ./db/EMS_db.sql:/docker-entrypoint-initdb.d/EMS_db.sql
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Start Postgres
+        run: |
+          docker run -d \
+            --name ems-postgres-db \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=admin \
+            -e POSTGRES_DB=ems_db \
+            -p 5432:5432 \
+            -v ${{ github.workspace }}/db/EMS_db.sql:/docker-entrypoint-initdb.d/EMS_db.sql \
+            --health-cmd="pg_isready -U postgres" \
+            --health-interval=10s \
+            --health-timeout=5s \
+            --health-retries=5 \
+            postgres:17
+
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in {1..20}; do
+            docker exec ems-postgres-db pg_isready -U postgres && break
+            echo "Waiting for Postgres..."
+            sleep 2
+          done
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -69,14 +75,9 @@ jobs:
       - name: Give permission
         run: chmod +x gradlew
 
-      - name: Install PostgreSQL Client
-        run: sudo apt-get install -y postgresql-client
-
-      - name: Load Database Script
-        run: |
-          psql -h localhost -U postgres -d ems_db -f EMS_db.sql
-        env:
-          PGPASSWORD: admin
-
       - name: Run Tests
         run: ./gradlew test
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/ems_db
+          DB_USER: postgres
+          DB_PASSWORD: admin
