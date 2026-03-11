@@ -63,6 +63,13 @@ jobs:
          ls -l db
          head -n 20 db/EMS_db.sql
 
+      - name: Check tables
+        run: |
+          sudo apt-get install -y postgresql-client
+          psql -h localhost -U postgres -d ems_db -c "\dt"
+          env:
+            PGPASSWORD: admin
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
