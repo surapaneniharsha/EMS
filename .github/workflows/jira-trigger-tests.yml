@@ -2,6 +2,11 @@ name: Run Tests from Jira
 
 on:
   workflow_dispatch:
+    inputs:
+      issue_key:
+        description: "Jira issue key"
+        required: false
+        type: string
 
   repository_dispatch:
     types: [jira-test-trigger]
@@ -23,6 +28,9 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x gradlew
+
+      - name: Print Jira issue
+        run: echo "Triggered by ${{ github.event.inputs.issue_key }}"
 
       - name: Run Tests
         run: ./gradlew test
