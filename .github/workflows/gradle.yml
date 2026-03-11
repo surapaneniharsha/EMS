@@ -31,37 +31,30 @@ jobs:
       - name: Build Project
         run: ./gradlew clean build -x test
 
-
   test:
     needs: build
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: ems_db
+        ports:
+          - 5432:5432
+        volumes:
+          - ${{ github.workspace }}/db/EMS_db.sql:/docker-entrypoint-initdb.d/EMS_db.sql
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Start Postgres
-        run: |
-          docker run -d \
-            --name ems-postgres-db \
-            -e POSTGRES_USER=postgres \
-            -e POSTGRES_PASSWORD=admin \
-            -e POSTGRES_DB=ems_db \
-            -p 5432:5432 \
-            -v ${{ github.workspace }}/db/EMS_db.sql:/docker-entrypoint-initdb.d/EMS_db.sql \
-            --health-cmd="pg_isready -U postgres" \
-            --health-interval=10s \
-            --health-timeout=5s \
-            --health-retries=5 \
-            postgres:17
-
-      - name: Wait for Postgres to be ready
-        run: |
-          for i in {1..20}; do
-            docker exec ems-postgres-db pg_isready -U postgres && break
-            echo "Waiting for Postgres..."
-            sleep 2
-          done
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -74,6 +67,16 @@ jobs:
 
       - name: Give permission
         run: chmod +x gradlew
+
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in {1..20}; do
+            pg_isready -h localhost -p 5432 -U postgres && break
+            echo "Waiting for Postgres..."
+            sleep 2
+          done
+        env:
+          PGPASSWORD: admin
 
       - name: Run Tests
         run: ./gradlew test
