@@ -1,29 +1,37 @@
-DROP DATABASE IF EXISTS ems_db;
-
-CREATE DATABASE ems_db;
-\c ems_db
--- 1. Drop Child Table first (due to Foreign Key)
+-- =====================================
+-- Drop Child Table first (due to FK)
+-- =====================================
 DROP TABLE IF EXISTS employee;
 
--- 2. Drop Parent Table
+-- =====================================
+-- Drop Parent Table
+-- =====================================
 DROP TABLE IF EXISTS department;
 
--- 3. Drop Enums
+-- =====================================
+-- Drop Enums
+-- =====================================
 DROP TYPE IF EXISTS gender_enum;
 DROP TYPE IF EXISTS marital_enum;
 
--- 4. Re-create Enums
+-- =====================================
+-- Create Enums
+-- =====================================
 CREATE TYPE gender_enum AS ENUM ('MALE', 'FEMALE', 'OTHERS');
 CREATE TYPE marital_enum AS ENUM ('MARRIED', 'SINGLE');
 
--- 5. Re-create Parent Table
+-- =====================================
+-- Create Department Table
+-- =====================================
 CREATE TABLE department (
     dept_id SERIAL PRIMARY KEY,
     dept_name VARCHAR(100) NOT NULL UNIQUE,
     location VARCHAR(100)
 );
 
--- 6. Re-create Child Table
+-- =====================================
+-- Create Employee Table
+-- =====================================
 CREATE TABLE employee (
     emp_id SERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
@@ -51,7 +59,7 @@ CREATE TABLE employee (
 );
 
 -- =====================================
--- Insert 10 departments
+-- Insert Departments
 -- =====================================
 INSERT INTO department (dept_name, location) VALUES
 ('Human Resources', 'New York'),
@@ -66,37 +74,25 @@ INSERT INTO department (dept_name, location) VALUES
 ('Customer Service', 'Dubai');
 
 -- =====================================
--- Insert 50 employees (5 per department)
+-- Insert Employees
 -- =====================================
 INSERT INTO employee 
 (first_name, last_name, phone, email, gender, national_id, passport_id, citizenship, marital_status, blood_group, identity_marks, salary, job_title, disability, bank_name, acc_no, dept_id)
 VALUES
--- Department 1: Human Resources
-('John', 'Doe', '555-0100', 'john.doe@example.com', 'MALE', 'NID1001', 'P1001', 'US', 'SINGLE', 'O+', 'Mole on cheek', 70000, 'HR Manager', FALSE, 'Bank of America', 'US123456789', 1),
-('Anna', 'Clark', '555-0101', 'anna.clark@example.com', 'FEMALE', 'NID1002', 'P1002', 'US', 'MARRIED', 'A+', 'Tattoo on wrist', 65000, 'HR Specialist', FALSE, 'Bank of America', 'US223456789', 1),
-('Robert', 'Hall', '555-0102', 'robert.hall@example.com', 'MALE', 'NID1003', 'P1003', 'US', 'SINGLE', 'B+', 'Scar on hand', 60000, 'Recruiter', FALSE, 'Bank of America', 'US323456789', 1),
-('Laura', 'Young', '555-0103', 'laura.young@example.com', 'FEMALE', 'NID1004', 'P1004', 'US', 'MARRIED', 'AB+', 'Mole on arm', 62000, 'HR Coordinator', FALSE, 'Bank of America', 'US423456789', 1),
-('David', 'King', '555-0104', 'david.king@example.com', 'MALE', 'NID1005', 'P1005', 'US', 'SINGLE', 'O-', 'Birthmark on neck', 58000, 'HR Assistant', FALSE, 'Bank of America', 'US523456789', 1),
+('John','Doe','555-0100','john.doe@example.com','MALE','NID1001','P1001','US','SINGLE','O+','Mole on cheek',70000,'HR Manager',FALSE,'Bank of America','US123456789',1),
+('Anna','Clark','555-0101','anna.clark@example.com','FEMALE','NID1002','P1002','US','MARRIED','A+','Tattoo on wrist',65000,'HR Specialist',FALSE,'Bank of America','US223456789',1),
+('Robert','Hall','555-0102','robert.hall@example.com','MALE','NID1003','P1003','US','SINGLE','B+','Scar on hand',60000,'Recruiter',FALSE,'Bank of America','US323456789',1),
+('Laura','Young','555-0103','laura.young@example.com','FEMALE','NID1004','P1004','US','MARRIED','AB+','Mole on arm',62000,'HR Coordinator',FALSE,'Bank of America','US423456789',1),
+('David','King','555-0104','david.king@example.com','MALE','NID1005','P1005','US','SINGLE','O-','Birthmark on neck',58000,'HR Assistant',FALSE,'Bank of America','US523456789',1),
 
--- Department 2: Finance
-('Jane', 'Smith', '555-0105', 'jane.smith@example.com', 'FEMALE', 'NID1006', 'P1006', 'GB', 'MARRIED', 'A+', 'Scar on hand', 80000, 'Finance Analyst', FALSE, 'HSBC', 'GB987654321', 2),
-('Paul', 'Wright', '555-0106', 'paul.wright@example.com', 'MALE', 'NID1007', 'P1007', 'GB', 'SINGLE', 'B+', 'Mole on cheek', 75000, 'Accountant', FALSE, 'HSBC', 'GB876543210', 2),
-('Emily', 'Scott', '555-0107', 'emily.scott@example.com', 'FEMALE', 'NID1008', 'P1008', 'GB', 'MARRIED', 'AB+', 'Tattoo on arm', 72000, 'Finance Coordinator', FALSE, 'HSBC', 'GB765432109', 2),
-('Mark', 'Evans', '555-0108', 'mark.evans@example.com', 'MALE', 'NID1009', 'P1009', 'GB', 'SINGLE', 'O-', 'Scar on forehead', 71000, 'Budget Analyst', FALSE, 'HSBC', 'GB654321098', 2),
-('Sophia', 'Morris', '555-0110', 'sophia.morris@example.com', 'FEMALE', 'NID1010', 'P1010', 'GB', 'MARRIED', 'A-', 'Mole on hand', 68000, 'Financial Auditor', FALSE, 'HSBC', 'GB543210987', 2),
+('Jane','Smith','555-0105','jane.smith@example.com','FEMALE','NID1006','P1006','GB','MARRIED','A+','Scar on hand',80000,'Finance Analyst',FALSE,'HSBC','GB987654321',2),
+('Paul','Wright','555-0106','paul.wright@example.com','MALE','NID1007','P1007','GB','SINGLE','B+','Mole on cheek',75000,'Accountant',FALSE,'HSBC','GB876543210',2),
+('Emily','Scott','555-0107','emily.scott@example.com','FEMALE','NID1008','P1008','GB','MARRIED','AB+','Tattoo on arm',72000,'Finance Coordinator',FALSE,'HSBC','GB765432109',2),
+('Mark','Evans','555-0108','mark.evans@example.com','MALE','NID1009','P1009','GB','SINGLE','O-','Scar on forehead',71000,'Budget Analyst',FALSE,'HSBC','GB654321098',2),
+('Sophia','Morris','555-0110','sophia.morris@example.com','FEMALE','NID1010','P1010','GB','MARRIED','A-','Mole on hand',68000,'Financial Auditor',FALSE,'HSBC','GB543210987',2),
 
--- Department 3: Engineering
-('Michael', 'Brown', '555-0111', 'michael.brown@example.com', 'MALE', 'NID1011', 'P1011', 'US', 'SINGLE', 'B+', 'Tattoo on arm', 95000, 'Software Engineer', FALSE, 'Chase Bank', 'US234567890', 3),
-('Linda', 'Green', '555-0112', 'linda.green@example.com', 'FEMALE', 'NID1012', 'P1012', 'US', 'MARRIED', 'O+', 'Scar on neck', 90000, 'Frontend Developer', FALSE, 'Chase Bank', 'US334567890', 3),
-('Kevin', 'Baker', '555-0113', 'kevin.baker@example.com', 'MALE', 'NID1013', 'P1013', 'US', 'SINGLE', 'AB+', 'Mole on hand', 88000, 'Backend Developer', FALSE, 'Chase Bank', 'US434567890', 3),
-('Rachel', 'Adams', '555-0114', 'rachel.adams@example.com', 'FEMALE', 'NID1014', 'P1014', 'US', 'MARRIED', 'A+', 'Tattoo on leg', 87000, 'DevOps Engineer', FALSE, 'Chase Bank', 'US534567890', 3),
-('Brian', 'Mitchell', '555-0115', 'brian.mitchell@example.com', 'MALE', 'NID1015', 'P1015', 'US', 'SINGLE', 'B-', 'Scar on arm', 86000, 'QA Engineer', FALSE, 'Chase Bank', 'US634567890', 3),
-
--- Department 4: Marketing
-('Emily', 'Davis', '555-0116', 'emily.davis@example.com', 'FEMALE', 'NID1016', 'P1016', 'CA', 'MARRIED', 'AB+', 'Birthmark on neck', 65000, 'Marketing Specialist', FALSE, 'Royal Bank of Canada', 'CA345678901', 4),
-('Daniel', 'Harris', '555-0117', 'daniel.harris@example.com', 'MALE', 'NID1017', 'P1017', 'CA', 'SINGLE', 'O+', 'Mole on chin', 63000, 'SEO Analyst', FALSE, 'Royal Bank of Canada', 'CA445678901', 4),
-('Grace', 'Robinson', '555-0118', 'grace.robinson@example.com', 'FEMALE', 'NID1018', 'P1018', 'CA', 'MARRIED', 'A+', 'Scar on hand', 62000, 'Content Strategist', FALSE, 'Royal Bank of Canada', 'CA545678901', 4),
-('Jason', 'Walker', '555-0119', 'jason.walker@example.com', 'MALE', 'NID1019', 'P1019', 'CA', 'SINGLE', 'B+', 'Tattoo on arm', 61000, 'Marketing Coordinator', FALSE, 'Royal Bank of Canada', 'CA645678901', 4),
-('Olivia', 'White', '555-0120', 'olivia.white@example.com', 'FEMALE', 'NID1020', 'P1020', 'CA', 'MARRIED', 'AB-', 'Birthmark on hand', 60000, 'Social Media Manager', FALSE, 'Royal Bank of Canada', 'CA745678901', 4);
-
--- Continue in the same pattern for Departments 5–10...
+('Michael','Brown','555-0111','michael.brown@example.com','MALE','NID1011','P1011','US','SINGLE','B+','Tattoo on arm',95000,'Software Engineer',FALSE,'Chase Bank','US234567890',3),
+('Linda','Green','555-0112','linda.green@example.com','FEMALE','NID1012','P1012','US','MARRIED','O+','Scar on neck',90000,'Frontend Developer',FALSE,'Chase Bank','US334567890',3),
+('Kevin','Baker','555-0113','kevin.baker@example.com','MALE','NID1013','P1013','US','SINGLE','AB+','Mole on hand',88000,'Backend Developer',FALSE,'Chase Bank','US434567890',3),
+('Rachel','Adams','555-0114','rachel.adams@example.com','FEMALE','NID1014','P1014','US','MARRIED','A+','Tattoo on leg',87000,'DevOps Engineer',FALSE,'Chase Bank','US534567890',3),
+('Brian','Mitchell','555-0115','brian.mitchell@example.com','MALE','NID1015','P1015','US','SINGLE','B-','Scar on arm',86000,'QA Engineer',FALSE,'Chase Bank','US634567890',3);
