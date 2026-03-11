@@ -44,17 +44,24 @@ jobs:
           POSTGRES_DB: ems_db
         ports:
           - 5432:5432
-        volumes:
-          - ${{ github.workspace }}/db/EMS_db.sql:/docker-entrypoint-initdb.d/EMS_db.sql
+       # volumes:
+       #   - ${{ github.workspace }}/db/EMS_db.sql:/docker-entrypoint-initdb.d/EMS_db.sql
         options: >-
+          -v ${{ github.workspace }}/db:/docker-entrypoint-initdb.d/
           --health-cmd="pg_isready -U postgres"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
 
     steps:
+           
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Verify SQL file
+        run: |
+         ls -l db
+         head -n 20 db/EMS_db.sql
 
       - name: Setup JDK
         uses: actions/setup-java@v4
