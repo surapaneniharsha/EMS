@@ -58,17 +58,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Verify SQL file
-        run: |
-         ls -l db
-         head -n 20 db/EMS_db.sql
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y postgresql-client
 
-      - name: Check tables
+      - name: Wait for Postgres
         run: |
-          sudo apt-get install -y postgresql-client
-          psql -h localhost -U postgres -d ems_db -c "\dt"
-          env:
-            PGPASSWORD: admin
+          for i in {1..20}; do
+            pg_isready -h localhost -p 5432 && break
+            sleep 2
+          done
+
+      - name: Run SQL script
+        run: |
+         PGPASSWORD=admin psql -h localhost -U postgres -d ems_db -f db/EMS_db.sql
 
       - name: Setup JDK
         uses: actions/setup-java@v4
