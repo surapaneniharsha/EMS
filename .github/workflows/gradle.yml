@@ -1,4 +1,4 @@
-name: EMS WITH CICD with Gradle
+name: EMS WITH CICD with Gradle .
 run-name: Build by ${{ github.actor }} on ${{ github.ref_name }} - Run #${{ github.run_number }}
 
 on:
