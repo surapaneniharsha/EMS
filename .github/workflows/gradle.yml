@@ -133,7 +133,7 @@ jobs:
           path: build/reports/tests/
   
   notify-on-failure:
-    needs: build
+    needs: [build, test]
     runs-on: ubuntu-latest
     if: always()
 
