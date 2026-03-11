@@ -72,6 +72,17 @@ jobs:
         run: |
          PGPASSWORD=admin psql -h localhost -U postgres -d ems_db -f db/EMS_db.sql
 
+      - name: Debug DB to check the Schema is present
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y postgresql-client
+            echo "Schemas:"
+            psql -h localhost -U postgres -d ems_db -c "\dn"
+            echo "Tables:"
+            psql -h localhost -U postgres -d ems_db -c "\dt *.*"
+        env:
+            PGPASSWORD: admin        
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -100,3 +111,60 @@ jobs:
           DB_URL: jdbc:postgresql://localhost:5432/ems_db
           DB_USER: postgres
           DB_PASSWORD: admin
+
+      - name: Print Postgres logs on failure
+        if: failure()
+        run: |
+          mkdir -p build/postgres-logs
+          docker logs ${{ job.services.postgres.id }} > build/postgres-logs/postgres.log
+
+      - name: Upload final Postgres logs
+        if: always()        
+        uses: actions/upload-artifact@v5
+        with:
+            name: postgres-logs
+            path: build/postgres-logs/
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-reports
+          path: build/reports/tests/
+  
+  notify-on-failure:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Send failure email via Zoho
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ${{ secrets.NOTIFY_EMAILS }}
+          from: ${{ secrets.SMTP_USERNAME }}
+          subject: "Build Update - PR #${{ github.event.pull_request.number }}"
+
+          body: |
+            Build Update.
+            Repository : ${{ github.repository }}
+
+            Pull Request Details
+            ------------------------------------------
+            PR Number      : #${{ github.event.pull_request.number }}
+            PR Title       : ${{ github.event.pull_request.title }}
+            Raised By      : ${{ github.event.pull_request.user.login }}
+
+            Source Branch  : ${{ github.head_ref }}
+            Target Branch  : ${{ github.base_ref }}
+
+            View Pull Request:
+            https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+
+            View Workflow Logs:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
