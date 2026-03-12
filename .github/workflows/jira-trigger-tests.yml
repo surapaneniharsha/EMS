@@ -118,14 +118,14 @@ jobs:
 
       - name: Print Jira issue
         run: echo "Triggered by ${{ github.event.inputs.issue_key }}"
-
-
+ 
   notify:
     needs: [build, run-tests]
     runs-on: ubuntu-latest
     if: always()
 
     steps:
+
       - name: Send email notification
         uses: dawidd6/action-send-mail@v3
         with:
@@ -153,3 +153,51 @@ jobs:
 
             View Workflow Logs and Test Reports:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+
+      - name: Comment on Jira (Success)
+        if: needs.run-tests.result == 'success'
+        run: |
+          curl -X POST \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data "{
+              \"body\": \"✅ Automation tests PASSED in GitHub CI.\nWorkflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+            }" \
+            ${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ github.event.inputs.issue_key }}/comment
+
+
+      - name: Move Jira to Tested
+        if: needs.run-tests.result == 'success'
+        run: |
+          curl -X POST \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{
+              "transition": { "id": "41" }
+            }' \
+            ${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ github.event.inputs.issue_key }}/transitions
+
+
+      - name: Comment on Jira (Failure)
+        if: needs.run-tests.result == 'failure'
+        run: |
+          curl -X POST \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data "{
+              \"body\": \"❌ Automation tests FAILED.\nPlease check logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+            }" \
+            ${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ github.event.inputs.issue_key }}/comment
+
+
+      - name: Move Jira to In Progress
+        if: needs.run-tests.result == 'failure'
+        run: |
+          curl -X POST \
+            -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{
+              "transition": { "id": "21" }
+            }' \
+            ${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ github.event.inputs.issue_key }}/transitions
