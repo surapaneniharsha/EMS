@@ -7,14 +7,43 @@ on:
         description: "Jira issue key"
         required: false
         type: string
+      issue_status:
+        description: "Jira status"
+        required: false
+        type: string
 
   repository_dispatch:
     types: [jira-test-trigger]
 
 jobs:
-  run-tests:
 
+  build:
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Give permission
+        run: chmod +x gradlew
+
+      - name: Build Project
+        run: ./gradlew clean build -x test
+
+
+  run-tests:
+    needs: build
+    runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:18
@@ -24,8 +53,6 @@ jobs:
           POSTGRES_DB: ems_db
         ports:
           - 5432:5432
-       # volumes:
-       #   - ${{ github.workspace }}/db/EMS_db.sql:/docker-entrypoint-initdb.d/EMS_db.sql
         options: >-
           -v ${{ github.workspace }}/db:/docker-entrypoint-initdb.d/
           --health-cmd="pg_isready -U postgres"
@@ -64,28 +91,16 @@ jobs:
 
       - name: Run SQL script
         run: |
-         PGPASSWORD=admin psql -h localhost -U postgres -d ems_db -f db/EMS_db.sql
+          PGPASSWORD=admin psql -h localhost -U postgres -d ems_db -f db/EMS_db.sql
 
-      - name: Debug DB to check the Schema is present
-        run: |
-            sudo apt-get update
-            sudo apt-get install -y postgresql-client
-            echo "Schemas:"
-            psql -h localhost -U postgres -d ems_db -c "\dn"
-            echo "Tables:"
-            psql -h localhost -U postgres -d ems_db -c "\dt *.*"
-        env:
-            PGPASSWORD: admin        
-
-      - name: Wait for Postgres to be ready
-        run: |
-          for i in {1..20}; do
-            pg_isready -h localhost -p 5432 -U postgres && break
-            echo "Waiting for Postgres..."
-            sleep 2
-          done
+      - name: Debug DB
         env:
           PGPASSWORD: admin
+        run: |
+          echo "Schemas:"
+          psql -h localhost -U postgres -d ems_db -c "\dn"
+          echo "Tables:"
+          psql -h localhost -U postgres -d ems_db -c "\dt *.*"
 
       - name: Run Tests
         run: ./gradlew test
@@ -94,27 +109,47 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: admin
 
-      - name: Print Postgres logs on failure
-        if: failure()
-        run: |
-          mkdir -p build/postgres-logs
-          docker logs ${{ job.services.postgres.id }} > build/postgres-logs/postgres.log
-
-      - name: Upload final Postgres logs
-        if: always()        
-        uses: actions/upload-artifact@v5
-        with:
-            name: postgres-logs
-            path: build/postgres-logs/
-
       - name: Upload Test Reports
         if: always()
         uses: actions/upload-artifact@v5
         with:
           name: test-reports
           path: build/reports/tests/
-        
+
       - name: Print Jira issue
         run: echo "Triggered by ${{ github.event.inputs.issue_key }}"
 
-  
+
+  notify:
+    needs: [build, run-tests]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Send email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ${{ secrets.NOTIFY_EMAILS }}
+          from: ${{ secrets.SMTP_USERNAME }}
+
+          subject: "Jira issue ${{ github.event.inputs.issue_key }} update"
+
+          body: |
+            Jira issue ${{ github.event.inputs.issue_key }} update.
+
+            Repository : ${{ github.repository }}
+
+            Jira issue Details
+            ------------------------------------------
+            Jira issue Number : ${{ github.event.inputs.issue_key }}
+            Jira issue Status : ${{ github.event.inputs.issue_status }}
+
+            Test Cases Run-status : ${{ needs.run-tests.result }}
+
+            View Workflow Logs and Test Reports:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
