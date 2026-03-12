@@ -15,22 +15,106 @@ jobs:
   run-tests:
 
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: ems_db
+        ports:
+          - 5432:5432
+       # volumes:
+       #   - ${{ github.workspace }}/db/EMS_db.sql:/docker-entrypoint-initdb.d/EMS_db.sql
+        options: >-
+          -v ${{ github.workspace }}/db:/docker-entrypoint-initdb.d/
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          java-version: "17"
+          distribution: "temurin"
 
-      - name: Make gradlew executable
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Give permission
         run: chmod +x gradlew
 
-      - name: Print Jira issue
-        run: echo "Triggered by ${{ github.event.inputs.issue_key }}"
+      - name: Build Project
+        run: ./gradlew clean build -x test
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..20}; do
+            pg_isready -h localhost -p 5432 && break
+            sleep 2
+          done
+
+      - name: Run SQL script
+        run: |
+         PGPASSWORD=admin psql -h localhost -U postgres -d ems_db -f db/EMS_db.sql
+
+      - name: Debug DB to check the Schema is present
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y postgresql-client
+            echo "Schemas:"
+            psql -h localhost -U postgres -d ems_db -c "\dn"
+            echo "Tables:"
+            psql -h localhost -U postgres -d ems_db -c "\dt *.*"
+        env:
+            PGPASSWORD: admin        
+
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in {1..20}; do
+            pg_isready -h localhost -p 5432 -U postgres && break
+            echo "Waiting for Postgres..."
+            sleep 2
+          done
+        env:
+          PGPASSWORD: admin
 
       - name: Run Tests
         run: ./gradlew test
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/ems_db
+          DB_USER: postgres
+          DB_PASSWORD: admin
+
+      - name: Print Postgres logs on failure
+        if: failure()
+        run: |
+          mkdir -p build/postgres-logs
+          docker logs ${{ job.services.postgres.id }} > build/postgres-logs/postgres.log
+
+      - name: Upload final Postgres logs
+        if: always()        
+        uses: actions/upload-artifact@v5
+        with:
+            name: postgres-logs
+            path: build/postgres-logs/
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-reports
+          path: build/reports/tests/
+        
+      - name: Print Jira issue
+        run: echo "Triggered by ${{ github.event.inputs.issue_key }}"
+
+  
