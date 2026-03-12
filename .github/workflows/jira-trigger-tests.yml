@@ -24,16 +24,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup JDK
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           java-version: "17"
-          distribution: "temurin"
+          distribution: temurin
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Give permission
+      - name: Make gradlew executable
         run: chmod +x gradlew
 
       - name: Build Project
@@ -44,6 +44,12 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
+    outputs:
+      total: ${{ steps.summary.outputs.total }}
+      passed: ${{ steps.summary.outputs.passed }}
+      failed: ${{ steps.summary.outputs.failed }}
+      skipped: ${{ steps.summary.outputs.skipped }}
+
     services:
       postgres:
         image: postgres:18
@@ -53,30 +59,24 @@ jobs:
           POSTGRES_DB: ems_db
         ports:
           - 5432:5432
-        options: >-
-          -v ${{ github.workspace }}/db:/docker-entrypoint-initdb.d/
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup JDK
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           java-version: "17"
-          distribution: "temurin"
+          distribution: temurin
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Give permission
+      - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Install PostgreSQL client
+      - name: Install PostgreSQL Client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
       - name: Wait for Postgres
@@ -86,7 +86,7 @@ jobs:
             sleep 2
           done
 
-      - name: Load Database
+      - name: Run SQL Script
         run: |
           PGPASSWORD=admin psql -h localhost -U postgres -d ems_db -f db/EMS_db.sql
 
@@ -97,6 +97,20 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: admin
 
+      - name: Extract Test Summary
+        id: summary
+        if: always()
+        run: |
+          TOTAL=$(grep -o 'tests="[0-9]*"' build/test-results/test/*.xml | head -1 | grep -o '[0-9]*')
+          FAIL=$(grep -o 'failures="[0-9]*"' build/test-results/test/*.xml | head -1 | grep -o '[0-9]*')
+          SKIP=$(grep -o 'skipped="[0-9]*"' build/test-results/test/*.xml | head -1 | grep -o '[0-9]*')
+          PASS=$((TOTAL - FAIL - SKIP))
+
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "passed=$PASS" >> $GITHUB_OUTPUT
+          echo "failed=$FAIL" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIP" >> $GITHUB_OUTPUT
+
       - name: Upload Test Reports
         if: always()
         uses: actions/upload-artifact@v5
@@ -106,7 +120,7 @@ jobs:
 
 
   notify:
-    needs: [build, run-tests]
+    needs: run-tests
     runs-on: ubuntu-latest
     if: always()
 
@@ -126,44 +140,47 @@ jobs:
           subject: "Jira issue ${{ github.event.inputs.issue_key }} update"
 
           body: |
-            Jira issue ${{ github.event.inputs.issue_key }} update.
+            Jira Issue : ${{ github.event.inputs.issue_key }}
 
-            Repository : ${{ github.repository }}
+            Test Results
+            -------------------------------
+            Total Tests : ${{ needs.run-tests.outputs.total }}
+            Passed      : ${{ needs.run-tests.outputs.passed }}
+            Failed      : ${{ needs.run-tests.outputs.failed }}
+            Skipped     : ${{ needs.run-tests.outputs.skipped }}
 
-            Jira issue Details
-            ------------------------------------------
-            Jira issue Number : ${{ github.event.inputs.issue_key }}
-            Jira issue Status : ${{ github.event.inputs.issue_status }}
+            Test Status : ${{ needs.run-tests.result }}
 
-            Test Cases Run-status : ${{ needs.run-tests.result }}
-
-            Workflow:
+            Workflow Logs:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
 
-      - name: Comment Jira Success
-        if: needs.run-tests.result == 'success'
+      - name: Comment Jira with Test Results
         run: |
           curl -X POST \
           -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
           -H "Content-Type: application/json" \
-          --data '{
-            "body": {
-              "type": "doc",
-              "version": 1,
-              "content": [{
-                "type": "paragraph",
-                "content": [{
-                  "type": "text",
-                  "text": "Automation tests PASSED in GitHub CI."
-                }]
-              }]
+          --data "{
+            \"body\":{
+              \"type\":\"doc\",
+              \"version\":1,
+              \"content\":[
+                {
+                  \"type\":\"paragraph\",
+                  \"content\":[
+                    {
+                      \"type\":\"text\",
+                      \"text\":\"Automation Test Results\n\nTotal Tests: ${{ needs.run-tests.outputs.total }}\nPassed: ${{ needs.run-tests.outputs.passed }}\nFailed: ${{ needs.run-tests.outputs.failed }}\nSkipped: ${{ needs.run-tests.outputs.skipped }}\n\nExecuted via GitHub CI.\"
+                    }
+                  ]
+                }
+              ]
             }
-          }' \
+          }" \
           ${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ github.event.inputs.issue_key }}/comment
 
 
-      - name: Move Jira to Ready for Testing
+      - name: Move Jira to Tested
         if: needs.run-tests.result == 'success'
         run: |
           curl -X POST \
@@ -171,28 +188,6 @@ jobs:
           -H "Content-Type: application/json" \
           --data '{"transition":{"id":"12"}}' \
           ${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ github.event.inputs.issue_key }}/transitions
-
-
-      - name: Comment Jira Failure
-        if: needs.run-tests.result == 'failure'
-        run: |
-          curl -X POST \
-          -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          --data '{
-            "body": {
-              "type": "doc",
-              "version": 1,
-              "content": [{
-                "type": "paragraph",
-                "content": [{
-                  "type": "text",
-                  "text": "Automation tests FAILED. Please check GitHub logs."
-                }]
-              }]
-            }
-          }' \
-          ${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ github.event.inputs.issue_key }}/comment
 
 
       - name: Move Jira to In Progress
